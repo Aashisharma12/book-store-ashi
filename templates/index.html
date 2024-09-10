@@ -1,0 +1,293 @@
+{% extends 'main_tempalte.html' %}
+{% load static %}
+{% block title %}
+    index
+{% endblock %}
+
+{% block content %}
+
+ 
+<div class="wrap_container">
+    
+    <div class="manage-height">
+        <form class="form-inline row justify-content-end" method="POST">
+            {% csrf_token %}
+            <div class="form-group col-auto mb-2">
+                <label for="form2Example1" class="sr-only">Search</label>
+                <input type="text" name="search" id="form2Example1" class="form-control" placeholder="Search"/>
+            </div>
+            <div class="col-auto mb-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+       
+              
+        {% if results %}
+            <ul>
+               {% for book in results %}
+                       <li>{{ book.title }} by {{ book.author }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+       
+        
+        <div class="row">
+            {% for data in bookdata %}
+                <div class="col-3 mb-3">
+                    <div class="card" style="width: 100%; max-width: 22rem;">
+                        <img src="static/{{ data.book_picture }}" class="card-img-top" alt="{{ data.book_name }}" style="height: 112px; width: 100%; object-fit: cover;">
+    
+                           <div class="card-body">
+                                  <h3 class="card-title">{{ data.book_name }}</h3>
+                                  <h6 class="card-subtitle mb-2 text-muted">{{ data.book_title }}</h6>
+                                  <p class="card-text">{{ data.book_desc }}</p>
+                                  <p class="card-text"><strong>Price:</strong> {{ data.book_price }}</p>
+                                  <a href="{% url 'buybook' data.book_id %}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Buy Now">
+                                    <i class="bi bi-cart"></i>
+                                  </a>
+                                  
+                                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rateModal{{ data.book_id }}" data-toggle="tooltip" data-placement="top" title="Rate">
+                                    <i class="bi bi-star"></i>
+                                  </button>
+
+                                   <button type="button" class="btn btn-primary" id="" onclick="loadReviews({{data.book_id}})"      data-toggle="modal" data-target="#reviewModal{{ data.book_id }}" data-toggle="tooltip" data-placement="top" title="Load Review">
+                                    <i class="bi bi-chat"></i>
+                                   </button>
+
+                                  <button type="button" class="btn btn-primary" id="wishlist-button-{{ data.book_id }}" 
+                                    onclick="add_to_wishlist({{ data.book_id }})" 
+                                    data-toggle="tooltip" 
+                                    data-placement="top" 
+                                    title="Add to Wishlist">
+                                    <i class="bi-heart-fill" id="wishlist-icon-{{ data.book_id }}"></i>
+                                    </button>
+                                                                      
+                                    
+                                  
+                                  
+                                
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="modal fade reviewsave" id="rateModal{{ data.book_id }}" tabindex="-1" role="dialog" aria-labelledby="rateModalLabel{{ data.book_id }}" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="rateModalLabel{{ data.book_id }}">Rate {{ data.book_name }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="rating{{ data.book_id }}">Rating</label>
+                                        <select class="form-control" id="rating{{ data.book_id }}">
+                                            <option value="1">1 Star</option>
+                                            <option value="2">2 Stars</option>
+                                            <option value="3">3 Stars</option>
+                                            <option value="4">4 Stars</option>
+                                            <option value="5">5 Stars</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="rateReview{{ data.book_id }}">Review</label>
+                                        <textarea class="form-control" id="rateReview{{ data.book_id }}" rows="3"></textarea>
+                                    </div>
+                                    
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" id="submit-review" class="btn btn-primary">Save Rating</button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <!-- Review Modal -->
+<div class="modal fade" id="reviewModal{{ data.book_id }}" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel{{ data.book_id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel{{ data.book_id }}">Reviews for {{ data.book_name }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="reviews-container-{{ data.book_id }}">
+                <!-- Reviews will be dynamically loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+            {% endfor %}
+        </div>
+        
+    </div>       
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.modal').on('click', '#submit-review', function() {
+            const bookId = $(this).closest('.modal').attr('id').replace('rateModal', '');
+            //alert(bookId);
+            const rating = $('#rating' + bookId).val();
+            const review = $('#rateReview' + bookId).val();
+            //$('.reviewsave').modal('hide');
+            $('.close').click();
+            // AJAX call to submit the review
+            $.ajax({
+                //url: '/savereview', // Change this to your server endpoint
+                url: '{% url "savereview" %}',
+                type: 'POST',
+                data: {
+                    book_id: bookId,
+                    rating: rating,
+                    review: review,
+                    csrfmiddlewaretoken: '{{ csrf_token }}' // Include CSRF token if needed
+                },
+                success: function(response) {
+                    // Handle success response
+                    alert('Review submitted successfully!');
+                },
+                error: function(error) {
+                    // Handle error response
+                    alert('Error submitting review. Please try again.');
+                }
+            });
+        });
+    });
+    function loadReviews(bookId) {
+        // Make an AJAX request to load reviews
+        $.ajax({
+            url: `/loadReviews/${bookId}`,  // Use the book ID to get the specific reviews
+            type: 'GET',
+            success: function(response) {
+                const reviewsSection = $(`#reviews-container-${bookId}`);
+                
+                // Clear existing reviews
+                reviewsSection.empty();
+    
+                // Check if there are any reviews
+                if (response.reviews.length > 0) {
+                    // Loop through the reviews and append them to the modal
+                    response.reviews.forEach(function(review) {
+                        reviewsSection.append(`
+                            <div class="review">
+                                <strong>${review.user__username}:</strong> 
+                                <span>${review.rating}/5</span>
+                                <p>${review.comment}</p>
+                                <small>Reviewed on: ${new Date(review.created_at).toLocaleDateString()}</small>
+                            </div>
+                            <hr/>
+                        `);
+                    });
+                } else {
+                    reviewsSection.append('<p>No reviews yet. Be the first to review this book!</p>');
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+    }
+    
+    
+    
+ 
+
+function add_to_wishlist(bookId) {
+    $.ajax({
+        url: "{% url 'add_to_wishlist' %}",
+        type: "POST",
+        data: {
+            'book_id': bookId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Toggle the button and icon based on the action performed
+            let button = $('#wishlist-button-' + bookId);
+            let icon = $('#wishlist-icon-' + bookId);
+
+            if (response.action === 'added') {
+                button.attr('title', 'Remove from Wishlist');
+                icon.removeClass('bi-heart-fill').addClass(' bi bi-heart');
+            } else if (response.action === 'removed') {
+                button.attr('title', 'Add to Wishlist');
+                icon.removeClass(' bi bi-heart').addClass('bi-heart-fill');
+            }
+            
+            
+        },
+        error: function(xhr, errmsg, err) {
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+}
+
+</script>
+
+
+
+
+
+
+{% endblock %}
+{% block extra_css %}
+<style>
+    .text-center {
+        text-align: center;
+    }
+    .text-right {
+        text-align: right;
+    }
+    /* Additional CSS can go here */
+</style>
+
+<style>
+    .scrolling-text {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        box-sizing: border-box;
+        animation: scroll-left 15s linear infinite;
+    }
+
+    .news-item {
+        display: inline-block;
+        padding-right: 2rem; /* Space between news items */
+    }
+
+    @keyframes scroll-left {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(-100%);
+        }
+    }
+</style>
+<script>
+    const ticker = document.getElementById('newsTicker');
+if (ticker) {
+    ticker.addEventListener('mouseover', () => {
+        ticker.style.animationPlayState = 'paused';
+    });
+    ticker.addEventListener('mouseout', () => {
+        ticker.style.animationPlayState = 'running';
+    });
+}
+
+</script>
+
+{% endblock %}
