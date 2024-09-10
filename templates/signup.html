@@ -1,0 +1,77 @@
+{% extends 'main_tempalte.html' %}
+{% load static %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+    <div class="manage-height">
+    <div class="row justify-content-center">
+        <div class="col-md-4 bg-light">
+            <div class="card-header text-center"> 
+                <h2>Register</h2>
+               
+                {% if messages %}
+                   {% for message in messages %}
+                       {% if message.tags == 'success' %}
+                           <div class="alert alert-success mt-2" role="alert">
+                                   {{ message }}
+                            </div>
+                        {% elif message.tags == 'error' %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                    {{ message }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info mt-2" role="alert">
+                                  {{ message }}
+                            </div>
+                        {% endif %}
+                     {% endfor %}
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                        
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example1">User name</label>
+                        <input type="text" name="username" placeholder=" " id="form2Example1" class="form-control" />  <!-- Specified input type -->
+                    </div>
+                  
+                
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example2">Password</label>
+                        <input type="password" placeholder=" " name="password" id="form2Example2" class="form-control" />
+                    </div>
+                    
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example3">First name</label>
+                        <input type="text" name="first_name" id="form2Example3" class="form-control" />  <!-- Specified input type -->
+                    </div>
+                      
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example4">Last name</label>
+                        <input type="text" name="last_name" id="form2Example4" class="form-control" />  <!-- Specified input type -->
+                    </div>
+
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example5">Email id</label>
+                        <input type="email" placeholder="test@test.com" name="email" id="form2Example5" class="form-control" />  <!-- Specified input type -->
+                    </div>
+
+                
+                    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">Save</button>  <!-- Corrected 'sumbit' to 'submit' -->
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-start">
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img3.webp"
+                 class="img-fluid" style="border-top-right-radius: .3rem; border-top-left-radius: .3rem;"
+                 alt="Sample photo">
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

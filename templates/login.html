@@ -1,0 +1,72 @@
+
+{% extends 'main_tempalte.html' %}
+{% load static %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-centre">
+                    <h2>Login</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                            <!-- Email input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                            <label class="form-label" for="form2Example1">User name</label>
+                              <input type="" name = "username"id="form2Example1" class="form-control" />
+                              
+                            </div>
+                          
+                            <!-- Password input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label class="form-label" for="form2Example2">Password</label>
+                              <input type="password" name = "password" id="form2Example2" class="form-control" />
+                              
+                            </div>
+                          
+                            <!-- 2 column grid layout for inline styling -->
+                            
+                          
+                    
+                          
+                            <!-- Submit button -->
+                            <button  type="sumbit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">Login</button>
+                            
+                            <a class="btn btn-primary btn-block mb-4" href="/signup">Signup</a>
+                        
+
+                            
+                          </form>
+                          <style>
+                            .custom-button {
+                                padding: 5px 10px; /* Adjust padding for smaller buttons */
+                                font-size: 14px;   /* Adjust font size */
+                            }
+                        </style>
+                        
+
+                        
+                    </form>
+                </div>
+                {% if messages %}
+                   {% for message in messages %}
+                       {% if message.tags == 'success' %}
+                           <div class="alert alert-success mt-2" role="alert">
+                                   {{ message }}
+                            </div>
+                        {% endif %}    
+                     {% endfor %}        
+                          
+               {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

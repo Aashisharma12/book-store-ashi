@@ -1,0 +1,15 @@
+{% extends 'main_tempalte.html' %}
+{% load static %}
+
+{% block title %}
+    Logout
+{% endblock %}
+
+{% block content %}
+    <div class="logout-container">
+        <h1>Logout</h1>
+        <p>Are you sure you want to log out?</p>
+        <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a> 
+    </div>
+{% endblock %}

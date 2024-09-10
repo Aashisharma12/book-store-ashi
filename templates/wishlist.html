@@ -1,0 +1,39 @@
+{% extends 'main tempalte.html'%}
+{% block content %}
+<h2>Your Wishlist</h2>
+<ul>
+    {% for item in wishlist_items %}
+        <li>
+            <a href="{% url 'wishlist' item.product.id %}">
+                {{ item.product.name }} - {{ item.product.price }} USD
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+<div id="wishlist-container">
+    
+</div>
+<h1>{{ book.title }}</h1>
+<p><strong>Author:</strong> {{ book.author }}</p>
+<p><strong>Price:</strong> {{ book.price }} USD</p>
+<p><strong>Description:</strong> {{ book.description }}</p>
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.wishlist-item').on('click', function() {
+        var bookId = $(this).data('book-id');
+
+        $.ajax({
+            url: '/wishlist_view/${bookId}',
+            type: 'GET',
+            success: function(data) {
+                $('#wishlist-container').html(data);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

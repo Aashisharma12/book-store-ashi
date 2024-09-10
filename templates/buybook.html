@@ -1,0 +1,31 @@
+{% extends 'main_tempalte.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}!</p>
+    
+{% endif %}
+
+    {% if qr_code_data %}
+    <h2>Scan this QR Code to Pay ₹{{ amount }}</h2>
+    <img src="data:image/png;base64,{{ qr_code_data }}" alt="QR Code" style="height:300px; width: 300px;">
+    {% else %}
+    <p>No QR code available.</p>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+<script>
+    document.getElementById('barcode-input').addEventListener('input', function(event) {
+        if (event.target.value.length >= 12) {  // Assuming a typical barcode length
+            document.getElementById('buy-form').submit();
+        }
+    });
+
+</script>    
+
+    
+
+{% endblock %}
