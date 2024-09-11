@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure--0t_8kzi2v*ib+n=fzh0nkyh6%7&vyjsnb51ef2rni_hv2n*vh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','.vercel.app']
 
 
 # Application definition
@@ -74,21 +75,28 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'book_store',      # Replace with your database name
+        'NAME': 'book_store',  # Replace with your database name
         'USER': 'root',  # Replace with your database username
-        'PASSWORD': '', # Replace with your database password
-        'HOST': 'localhost',      # Replace with your database host
-        'PORT': '3306', 
+        'PASSWORD': '',  # Replace with your database password
+        'HOST': '',  # Replace with your database host
+        'PORT': '3306',  # Default MySQL port
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'",
-        },          # Replace with your database port (MySQL default is 3306)
+            'charset': 'utf8mb4',
+            'ssl': {'ca': os.environ.get('MYSQL_ATTR_SSL_CA')},
+        },
     }
 }
-    
 
+# If using dj_database_url to parse DATABASE_URL
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    DATABASES['default']['OPTIONS']['charset'] = 'utf8mb4'
+    DATABASES['default']['OPTIONS']['ssl'] = {'ca': os.environ.get('MYSQL_ATTR_SSL_CA')}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
