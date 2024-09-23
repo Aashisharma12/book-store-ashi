@@ -1,0 +1,102 @@
+{% extends 'main_tempalte.html' %}
+
+{% block content %}
+<h2>Your Wishlist</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Book Title</th>
+            <th>Book Description</th>
+            <th>Book Name</th>
+            <th>Book Category</th>
+            <th>Book Price</th>
+            <th>Action</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in bookdetails %}
+        <tr>
+            <td><a href="{% url 'buybook' item.book_id %}" style="text-decoration: none;">{{ item.book_title }}</a></td>
+
+            <td>{{ item.book_desc }}</td>
+            <td>{{ item.book_name }}</td>
+            <td>{{ item.book_category }}</td>
+            <td>{{ item.book_price }}</td>
+            <td>
+                <button type="button" class="btn btn-danger wishlist-action" data-book-id="{{ item.book_id }}" data-action="remove">Remove from Wishlist</button>
+
+             </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="wishlist-container">
+    <!-- AJAX content will be loaded here -->
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Attach a click event handler for all elements with the class 'wishlist-action'
+    $('.wishlist-action').on('click', function(event) {
+        event.preventDefault();  // Prevent default link behavior
+
+        var bookId = $(this).data('book-id');  // Get the book ID from data attribute
+        
+        // Confirm the removal action
+        if (confirm("Are you sure you want to remove this book from your wishlist?")) {
+            // Make AJAX call to remove the book from the wishlist
+            $.ajax({
+                url: '/wishlist/remove/' + bookId + '/',  // Adjust this URL according to your Django setup
+                type: 'POST',
+                data: {
+                    book_id: bookId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token
+                },
+                success: function(data) {
+                    alert("Book removed from your wishlist!");
+                    location.reload();  // Reload the page to reflect changes
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error removing book from wishlist:', error);
+                }
+            });
+        }
+    });
+});
+$(document).ready(function() {
+    $('.wishlist-action').on('click', function() {
+        var bookId = $(this).data('book-id');
+
+        // Send AJAX request to remove the book from the wishlist
+        $.ajax({
+            url: '/wishlist/remove/' + book_id + '/',  // Replace with your remove URL
+            method: 'POST',
+            data: {
+                'book_id': bookId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Include CSRF token
+            },
+            success: function(response) {
+                // Handle successful removal (e.g., remove the item from the DOM)
+                alert('Book removed from wishlist');
+                // Optionally, you can also remove the item from the UI
+                // $(this).closest('tr').remove(); // Adjust as per your structure
+            },
+            error: function(xhr) {
+                // Handle error
+                alert('Error removing book from wishlist');
+            }
+        });
+    });
+});
+
+
+</script>
+
+{% endblock %}
